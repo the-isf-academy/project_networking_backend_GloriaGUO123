@@ -2,7 +2,7 @@
 
 from banjo.models import Model, StringField, IntegerField, FloatField, BooleanField, ForeignKey
 
-class Canva: 
+class Canva(Model): 
     like = IntegerField()
     # view = IntegerField()
     # created_time = StringField()
@@ -18,12 +18,12 @@ class Canva:
     #         'popularity_percentage': self
     #     }
 
-class Emoji:
+class Emoji(Model):
     input_emoji = StringField()
     # username = StringField()
     # x_coordinates = IntegerField()
     # y_coordinates = IntegerField()
-    acess_code = ForeignKey(Canva, on_delete=Model.CASCADE)
+    acess_code = ForeignKey(Canva)
 
     # def json_response(self):
     #     return {
