@@ -12,7 +12,7 @@ def all_emojis(args):
     if emojis_list != []:
         return {'Emojis': emojis_list}
     elif emojis_list == []:
-        return {'Error': 'No emojis exist'}
+        return {'Error': 'No emojis exist currently'}
 
 @route_post(BASE_URL + 'new', args={'emoji':str, 'username': str})
 def new_emoji(args):

@@ -3,7 +3,7 @@
 from banjo.models import Model, StringField, IntegerField, FloatField, BooleanField, ForeignKey
 
 class Emoji(Model):
-    input_emoji = StringField()
+    emoji = StringField()
     username = StringField()
     # x_coordinates = IntegerField()
     # y_coordinates = IntegerField()
