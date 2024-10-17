@@ -22,9 +22,9 @@ def new_emoji(args):
         )
     new_emoji.setting_position()
     new_emoji.save()
-    return {'Emoji': new_emoji.json_response()}
-    # if new_emoji.setting_position() == True:
-    #     return {'Emoji': new_emoji.json_response()}
+    if new_emoji.setting_position() == True:
+        return {'Emoji': new_emoji.json_response()}
     
-    # elif new_emoji.setting_position == False:
-    #     return {'Error': 'The canva size has reached to its maximum'}
+    elif new_emoji.setting_position == False:
+        return {'Error': 'The canva size has reached to its maximum'}
+
