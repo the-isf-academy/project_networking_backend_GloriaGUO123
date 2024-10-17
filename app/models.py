@@ -8,6 +8,11 @@ class Emoji(Model):
     x_coordinates = IntegerField()
     y_coordinates = IntegerField()
 
+    # Ask about the difference between _str__ and json_response
+    # ask about self.save()
+    def __str__(self):
+        return f"{self.emoji} created by {self.username}"
+
     def json_response(self):
         return {
             'id': self.id,
@@ -36,19 +41,32 @@ class Emoji(Model):
         #     return False
 
 
-# class Canva(Model): 
-#     like = IntegerField()
-#     emojis = ForeignKey(Emoji)
-    # view = IntegerField()
-    # created_time = StringField()
-    # popularity_percentage = FloatField()
-    # time_period = StringField()
-    # creator = StringField()
+class Canva(Model): 
+    like = IntegerField()
+    emojis = ForeignKey(Emoji)
+    view = IntegerField()
+    created_time = StringField()
+    popularity_percentage = FloatField()
+    time_period = StringField()
+    creator = StringField()
 
-    # def json_response(self):
-    #     return {
-    #         'id': self.id,
-    #         'like': self.like,
-    #         'created_time': self.created_time,
-    #         'popularity_percentage': self.popularity_percentage
-    #     }
+    def __str__(self):
+        return f"List of emojis: {self.emojis}"
+
+    def json_response(self):
+        return {
+            'id': self.id,
+            'emojis':self.emojis,
+            'like': self.like,
+            'created_time': self.created_time,
+            'popularity_percentage': self.popularity_percentage
+        }
+
+    def checking_accesscode(self, access_code):
+        for canva in Canva.objects.all():
+            if access_code == canva.id:
+                return True
+            elif access_code != canva.id:
+                return False
+
+    
