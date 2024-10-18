@@ -4,18 +4,48 @@ from banjo.urls import route_get, route_post
 from settings import BASE_URL
 from .models import Emoji, Canva
 
-@route_get(BASE_URL + 'all/emoji')
-def all_emojis(args = {'access_code':int}):
-    if Canva.checking_accesscode(args['access_code']) == True:
-        emojis_list = []
-        for emoji in Canva.objects.get(id=args['access_code']):
-            emojis_list.append(emoji.json_response())
-        if emojis_list != []:
-            return {'Emojis': emojis_list}
-        elif emojis_list == []:
-            return {'Error': 'No emojis exist currently'}
-    elif Canva.checking_accesscode(args['access_code']) == False:
-            return {'Error': 'Acess Code Incorrect'}
+# @route_get(BASE_URL + 'all/emoji')
+# # def all_emojis(args = {'access_code':int}):
+# def all_emojis(args):
+#     emojis_list = []
+#     for emoji in Emoji.objects.all():
+#         emojis_list.append(emoji.json_response())
+#     if emojis_list != []:
+#         return {'Emojis': emojis_list}
+#     elif emojis_list == []:
+#         return {'Error': 'No emojis exist currently'}
+
+# @route_get(BASE_URL + 'all/emoji', args = {'access_code':int})
+# def all_emojis(args):
+#     for canva in Canva.objects.all():
+#         print(args['access_code'])
+#         if canva.checking_accesscode(args['access_code']) == True:
+#             emojis_list = []
+#             user_canva = Canva.objects.get(id=args['access_code'])
+#             print(user_canva.emojis)
+#             for emoji in user_canva.emojis:
+#                 emojis_list.append(emoji.json_response())
+#             if emojis_list != []:
+#                 return {'Emojis': emojis_list}
+#             elif emojis_list == []:
+#                 return {'Error': 'No emojis exist currently'}
+#         elif canva.checking_accesscode(args['access_code']) == False:
+#                 return {'Error': 'Access Code Incorrect'}
+
+@route_get(BASE_URL + 'all/emoji', args = {'access_code':int})
+def all_emojis(args):
+    for canva in Canva.objects.all():
+        if canva.checking_accesscode(args['access_code']) == True:
+            emojis_list = []
+            user_canva = Canva.objects.get(id=args['access_code'])
+            for emoji in user_canva.emojis.all():
+                emojis_list.append(emoji.json_response())
+            if emojis_list != []:
+                return {'Emojis': emojis_list}
+            elif emojis_list == []:
+                return {'Error': 'No emojis exist currently'}
+        elif canva.checking_accesscode(args['access_code']) == False:
+                return {'Error': 'Access Code Incorrect'}
 
 # @route_get(BASE_URL + 'all/canva')
 # def all_canvas(args = {'accesscode':int}):

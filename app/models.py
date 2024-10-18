@@ -8,7 +8,6 @@ class Emoji(Model):
     x_coordinates = IntegerField()
     y_coordinates = IntegerField()
 
-    # Ask about the difference between _str__ and json_response
     # ask about self.save()
     def __str__(self):
         return f"{self.emoji} created by {self.username}"
@@ -35,7 +34,6 @@ class Emoji(Model):
             self.x_coordinates = 0
             self.y_coordinates = last_emoji.y_coordinates +1
             # return True
-        # Fix Return True Abstraction
         # elif last_emoji.y_coordinates >= 10:
         # # Reaches the maximum size of the canva (10x10)
         #     return False
@@ -51,7 +49,7 @@ class Canva(Model):
     creator = StringField()
 
     def __str__(self):
-        return f"List of emojis: {self.emojis}"
+        return f"id: {self.id}"
 
     def json_response(self):
         return {
@@ -63,10 +61,9 @@ class Canva(Model):
         }
 
     def checking_accesscode(self, access_code):
-        for canva in Canva.objects.all():
-            if access_code == canva.id:
+            if access_code == self.id:
                 return True
-            elif access_code != canva.id:
+            elif access_code != self.id:
                 return False
 
     
