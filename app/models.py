@@ -22,12 +22,6 @@ class Canva(Model):
             'access_code': self.id
         }
 
-    def checking_accesscode(self, access_code):
-        if access_code == self.id:
-            return True
-        elif access_code != self.id:
-            return False
-
 class Emoji(Model):
     emoji = StringField()
     username = StringField()
@@ -49,7 +43,7 @@ class Emoji(Model):
             }
     
     def setting_position(self, access_code):
-        # The size of the canva is 3x3
+        # The size of the canva is 4x4
         last_emoji = Emoji.objects.filter(canva=access_code).last()
         if last_emoji:
             if last_emoji.x_coordinates <3:
