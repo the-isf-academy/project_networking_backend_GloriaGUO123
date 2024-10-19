@@ -8,7 +8,6 @@ class Emoji(Model):
     x_coordinates = IntegerField()
     y_coordinates = IntegerField()
 
-    # ask about self.save()
     def __str__(self):
         return f"{self.emoji} created by {self.username}"
 
@@ -43,6 +42,7 @@ class Canva(Model):
     like = IntegerField()
     emojis = ForeignKey(Emoji)
     view = IntegerField()
+    like = IntegerField()
     created_time = StringField()
     popularity_percentage = FloatField()
     time_period = StringField()
