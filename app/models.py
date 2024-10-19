@@ -10,17 +10,28 @@ class Canva(Model):
     time_period = StringField()
 
     def __str__(self):
-        return f"id: {self.id}"
+        return f"id: {self.id}, like:{self.like}, view:{self.view}, created_time:{self.created_time}, popularity_percentage:{self.popularity_percentage}, time_period:{self.time_period}"
 
     def canva_json_response(self):
         return {
             'id': self.id,
-            # 'emojis':self.emojis,
             'like': self.like,
+            'view': self.view,
             'created_time': self.created_time,
             'popularity_percentage': self.popularity_percentage,
             'access_code': self.id
         }
+    
+    def increase_like(self):
+        self.like += 1
+        self.save()
+
+    def calculating_popularity(self):
+        #Conbining add_view with calculating popularity
+        self.view +=1
+        popularity = (self.like / self.view) * 100
+        self.popularity_percentage = round(popularity, 2)
+        self.save()
 
 class Emoji(Model):
     emoji = StringField()
@@ -44,6 +55,7 @@ class Emoji(Model):
     
     def setting_position(self, access_code):
         # The size of the canva is 4x4
+        # Ask about this line of code
         last_emoji = Emoji.objects.filter(canva=access_code).last()
         if last_emoji:
             if last_emoji.x_coordinates <3:
