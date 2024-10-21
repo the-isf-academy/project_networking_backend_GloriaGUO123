@@ -3,7 +3,7 @@
 from banjo.urls import route_get, route_post
 from settings import BASE_URL
 from .models import Emoji, Canva
-from time import time
+from datetime import datetime
 
 @route_get(BASE_URL + 'all/emoji', args = {'access_code':int})
 def all_emoji(args):
@@ -24,7 +24,7 @@ def all_emoji(args):
 # def all_canvas(args):
 #     canvas_list = []
 #     for canva in Canva.objects.filter(id=args['access_code']):
-#         canva.calculating_popularity()
+#         canva.add_view_and_calculating_popularity()
 #         canvas_list.append(canva.canva_json_response())
 #     if canvas_list != []:
 #         return {'Canvas': canvas_list}
@@ -35,7 +35,7 @@ def all_emoji(args):
 def all_canvas(args):
     canvas_list = []
     for canva in Canva.objects.all():
-        canva.calculating_popularity()
+        canva.add_view_and_calculating_popularity()
         canvas_list.append(canva.canva_json_response())
     if canvas_list != []:
         return {'Canvas': canvas_list}
@@ -45,8 +45,21 @@ def all_canvas(args):
 @route_get(BASE_URL + 'all/canva/popularity')
 def all_canvas_most_popularity(args):
     canvas_list = []
+    # Only returns the top 5 most popular canva based on the percentage of popularity
     for canva in Canva.objects.order_by('-popularity_percentage')[:5]:
-        canva.calculating_popularity()
+        canva.add_view_and_calculating_popularity()
+        canvas_list.append(canva.canva_json_response())
+    if canvas_list != []:
+        return {'Canvas': canvas_list}
+    elif canvas_list == []:
+        return {'Error': 'No canvas exist currently'}
+
+@route_get(BASE_URL + 'all/canva/recent')
+def all_canvas_most_recent(args):
+    canvas_list = []
+    # Only returns the top 5 most popular canva based on the created time
+    for canva in Canva.objects.order_by('-created_time')[:5]:
+        canva.add_view_and_calculating_popularity()
         canvas_list.append(canva.canva_json_response())
     if canvas_list != []:
         return {'Canvas': canvas_list}
@@ -55,14 +68,16 @@ def all_canvas_most_popularity(args):
 
 @route_post(BASE_URL + 'new/emoji', args={'emoji':str, 'username': str, 'access_code':int})
 def new_emoji(args):
-    #Ask how to fix the error, when the canva does not exit
     if Canva.objects.filter(id=args['access_code']).exists() == True:
         selected_canva = Canva.objects.get(id=args['access_code'])
         new_emoji = Emoji(
             emoji = args['emoji'],
             username = args['username'],
-            canva = selected_canva
+            canva = selected_canva,
+            #Note: Make it so that it maches with HK
+            input_time = datetime.now()
             )
+        new_emoji.allocate_time_period()
         new_emoji.setting_position(args['access_code'])
         if new_emoji.setting_position(args['access_code']) == True:
             new_emoji.save()
@@ -72,16 +87,16 @@ def new_emoji(args):
     elif Canva.objects.filter(id=args['access_code']).exists() == False:
         return {'Error': 'Access code does not exit'}
 
-@route_post(BASE_URL + 'new/canva', args = {'current_time': str})
+@route_post(BASE_URL + 'new/canva')
 def new_canva(args):
     new_canva = Canva(
         like = 0,
         view = 0,
-        created_time = args['current_time'],
-        popularity_percentage = 0,
-        time_period = ''
+        #Gets the current time of the user when they add a new canva (including date and time)
+        created_time = datetime.now(),
+        popularity_percentage = 0.0,
     )
-    new_canva.calculating_popularity()
+    new_canva.add_view_and_calculating_popularity()
     new_canva.save()
     return {'Canva': new_canva.canva_json_response()}
 
@@ -91,7 +106,7 @@ def like_canva(args):
         chosen_canva = Canva.objects.get(id=args['access_code'])
         # Why can't I chain them together
         chosen_canva.increase_like()
-        chosen_canva.calculating_popularity()
+        chosen_canva.add_view_and_calculating_popularity()
         return {'Canva':chosen_canva.canva_json_response()}
     else: 
         return {'Error': "No canva exist"}
