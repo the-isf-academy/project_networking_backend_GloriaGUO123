@@ -14,7 +14,7 @@ The "Mood of the Day" API is a collaborative platform inspired by Reddit r/place
 3. User can view all the emojis added to a canva or all the canvas that the user has created, but access code will be needed to ensure privacy
 
 **Important Notice**
-- For each canva, each user can only add in ONE new emoji during morning (4:00 AM to 11:59 AM), afternoon (12:00 PM to 5:59 PM), and evening (6:00 PM to 3:59 AM)
+- For each canva, each user can only add in ONE new emoji during Morning (4:00 AM to 11:59 AM), Afternoon (12:00 PM to 5:59 PM), and Evening (6:00 PM to 3:59 AM)
 - Please note that the maximum canva size is 4x4 (meaning that ONLY 16 emojis are allowed for each canva)
 - The editing access of the canva will be locked after 24 hours of the `created_time` 
 - Please remember the access code for each canva or else the user can not access the canva anymore
@@ -49,15 +49,15 @@ Please note that the x and y coordinates of the emoji is automatically allocated
 |like |Int |Stores the number of likes of that specific canva|0
 |popularity_percentage |Float |Stores the percentage of popularity of the canva|50.0
 |created_time |Str |Stores the created time of the canva|2024-10-20 04:21:55.161606
-|time_period  |Str |Sorts each edit time of the canva into "morning", "afternoon" and "evening"|morning
+|time_period  |Str |Sorts each edit time of the canva into "Morning", "Afternoon" and "Evening"|
 
 |Method   	|Parameter   	|Description   	|
 |---	|---	|---	|
 |str   	|self   	|Returns the object in a readable and informal, string representation 	|
 |canva_json_response |self    |Return the object in json response format, simular to a dictonary
 |check_twentyfourhour_time_entry |self |Checks if the last editing time of the user is more than 24 hours
-|check_time_period_entry |self |Checks if a specific user has already edit the canva in a time period (E.g. morning, afternoon or evening)
-|allocate_time_period|self |Based on the last editing time, it allocates it into either "morning", "afternoon" and "evening"
+|check_time_period_entry |self |Checks if a specific user has already edit the canva in a time period (E.g. Morning, Afternoon or Evening)
+|allocate_time_period|self |Based on the last editing time, it allocates it into either "Morning", "Afternoon" and "Evening"
 |increase_like |self    |Increases number of `like` of the specific canva
 |add_view_and_calculating_popularity |self |Increases number of `view` of the specific canva and calculates the `popularity_percentage` by simply dividing `like` by `view`
 

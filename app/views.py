@@ -79,11 +79,13 @@ def new_emoji(args):
             )
         new_emoji.allocate_time_period()
         new_emoji.setting_position(args['access_code'])
-        if new_emoji.setting_position(args['access_code']) == True:
+        if new_emoji.setting_position(args['access_code']) == True and selected_canva.check_twentyfourhour_time_entry() ==True:
             new_emoji.save()
             return {'Emoji': new_emoji.emoji_json_response()}
         elif new_emoji.setting_position(args['access_code']) == False:
             return {'Error': 'The canva size has reached to its maximum'}
+        elif selected_canva.check_twentyfourhour_time_entry() == False:
+            return {'Error': 'After 24 hours, the canva will be saved and no longer editable'}
     elif Canva.objects.filter(id=args['access_code']).exists() == False:
         return {'Error': 'Access code does not exit'}
 
@@ -94,7 +96,7 @@ def new_canva(args):
         view = 0,
         #Gets the current time of the user when they add a new canva (including date and time)
         created_time = datetime.now(),
-        popularity_percentage = 0.0,
+        popularity_percentage = 0.0
     )
     new_canva.add_view_and_calculating_popularity()
     new_canva.save()

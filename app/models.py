@@ -1,7 +1,7 @@
 # models.py
 
 from banjo.models import Model, StringField, IntegerField, FloatField, BooleanField, ForeignKey
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 class Canva(Model): 
     like = IntegerField()
@@ -33,9 +33,22 @@ class Canva(Model):
         self.popularity_percentage = round(popularity, 2)
         self.save()
 
-    # def check_twentyfourhour_time_entry(self):
+    def check_twentyfourhour_time_entry(self):
+        current_time = datetime.now()
+        # Convert create_time into a datetime object
+        created_time_datetime_object = datetime.strptime(self.created_time, '%Y-%m-%d %H:%M:%S.%f')
+        time_difference = current_time - created_time_datetime_object
+        # Check if the time difference is less than 24 hours
+        return time_difference < timedelta(hours=24)
 
-    # def check_time_period_entry(self):
+    def check_time_period_entry(self, username):
+        # current_time_period = 
+
+        # Checks if a specific user has already added an Emoji in the current time period
+        for emoji in Emoji.objects.filter(canva=self, username=username):
+            if emoji.time_period == current_time_period:
+                return False
+        return True
 
 class Emoji(Model):
     emoji = StringField()
@@ -79,23 +92,23 @@ class Emoji(Model):
             self.x_coordinates = 0
             self.y_coordinates = 0
         if self.y_coordinates >=4:
+            self.save()
             return False  # Indicate failure
         # Check if the new position is still within the canvas limits
+        self.save()
         return True  # Indicate success
     
     def allocate_time_period(self):
-        #converting string object into datetime format
-        # datetime_object = datetime.strptime(self.input_time, '%Y-%m-%d %H:%M:%S.%f')
         #extract the time part from the datetime object
         extracted_input_time = self.input_time.time()
         #Morning: 4:00 AM to 11:59 AM
         if time(4, 0) <= extracted_input_time < time(12, 0):
-            self.time_period = "morning"
+            self.time_period = "Morning"
         #Afternoon: 12:00 PM to 5:59 PM
         elif time(12, 0) <= extracted_input_time < time(18, 0):
-            self.time_period = "afternoon"
+            self.time_period = "Afternoon"
         #Evening: 6:00 PM to 3:59 AM
         else:
-            self.time_period = "evening"
+            self.time_period = "Evening"
         self.save()
     
