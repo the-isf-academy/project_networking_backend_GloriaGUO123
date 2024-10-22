@@ -41,11 +41,18 @@ class Canva(Model):
         # Check if the time difference is less than 24 hours
         return time_difference < timedelta(hours=24)
 
-    def check_time_period_entry(self, username):
-        # current_time_period = 
-
+    def check_time_period_entry(self, input_username):
+        current_time = datetime.now().time()
+        if time(4, 0) <= current_time < time(12, 0):
+            current_time_period = "Morning"
+        #Afternoon: 12:00 PM to 5:59 PM
+        elif time(12, 0) <= current_time < time(18, 0):
+            current_time_period = "Afternoon"
+        #Evening: 6:00 PM to 3:59 AM
+        else:
+            current_time_period = "Evening"
         # Checks if a specific user has already added an Emoji in the current time period
-        for emoji in Emoji.objects.filter(canva=self, username=username):
+        for emoji in Emoji.objects.filter(canva=self, username=input_username):
             if emoji.time_period == current_time_period:
                 return False
         return True

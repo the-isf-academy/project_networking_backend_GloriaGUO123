@@ -79,13 +79,15 @@ def new_emoji(args):
             )
         new_emoji.allocate_time_period()
         new_emoji.setting_position(args['access_code'])
-        if new_emoji.setting_position(args['access_code']) == True and selected_canva.check_twentyfourhour_time_entry() ==True:
+        if new_emoji.setting_position(args['access_code']) == True and selected_canva.check_twentyfourhour_time_entry() ==True and selected_canva.check_time_period_entry(args['username']) ==True:
             new_emoji.save()
             return {'Emoji': new_emoji.emoji_json_response()}
-        elif new_emoji.setting_position(args['access_code']) == False:
-            return {'Error': 'The canva size has reached to its maximum'}
         elif selected_canva.check_twentyfourhour_time_entry() == False:
             return {'Error': 'After 24 hours, the canva will be saved and no longer editable'}
+        elif selected_canva.check_time_period_entry(args['username']) == False:
+            return {'Error': 'The user has already input an emoji during this time period, please wait for the next time period'}
+        elif new_emoji.setting_position(args['access_code']) == False:
+            return {'Error': 'The canva size has reached to its maximum'}
     elif Canva.objects.filter(id=args['access_code']).exists() == False:
         return {'Error': 'Access code does not exit'}
 

@@ -100,8 +100,8 @@ Payload: access_code=1
     },
     {
       "id": 3,
-      "emoji": "🤣",
-      "username": "Gloria",
+      "emoji": "😚",
+      "username": "Amanda",
       "x_coordinates": 2,
       "y_coordinates": 0,
       "access_code": 1
