@@ -39,7 +39,7 @@ class Canva(Model):
         created_time_datetime_object = datetime.strptime(self.created_time, '%Y-%m-%d %H:%M:%S.%f')
         time_difference = current_time - created_time_datetime_object
         # Check if the time difference is less than 24 hours
-        return time_difference < timedelta(hours=24)
+        return time_difference < timedelta(hours=12)
 
     def check_time_period_entry(self, input_username):
         current_time = datetime.now().time()
@@ -51,8 +51,10 @@ class Canva(Model):
         #Evening: 6:00 PM to 3:59 AM
         else:
             current_time_period = "Evening"
+        print(f"Current time: {current_time}, Time period: {current_time_period}, User: {input_username}")
         # Checks if a specific user has already added an Emoji in the current time period
         for emoji in Emoji.objects.filter(canva=self, username=input_username):
+            print(f"Current time: {current_time}, Time period: {current_time_period}, User: {input_username}, Emoji Time: {emoji.time_period}")
             if emoji.time_period == current_time_period:
                 return False
         return True
@@ -84,26 +86,24 @@ class Emoji(Model):
     def setting_position(self, access_code):
         # The size of the canva is 4x4
         # Ask about this line of code
-        last_emoji = Emoji.objects.filter(canva=access_code).last()
-        if last_emoji:
-            if last_emoji.x_coordinates <3:
-                # Keeps adding to the value of the x coordinate until reaches 3
-                self.x_coordinates = last_emoji.x_coordinates + 1
-                self.y_coordinates = last_emoji.y_coordinates
-            elif last_emoji.x_coordinates >=3:
-                # Moves to the next column (y coordinate), as the x has reaches the maximum of 3
+            last_emoji = Emoji.objects.filter(canva=access_code).last()
+            if last_emoji:
+                if last_emoji.x_coordinates <3:
+                    # Keeps adding to the value of the x coordinate until reaches 3
+                    self.x_coordinates = last_emoji.x_coordinates + 1
+                    self.y_coordinates = last_emoji.y_coordinates
+                elif last_emoji.x_coordinates >=3:
+                    # Moves to the next column (y coordinate), as the x has reaches the maximum of 3
+                    self.x_coordinates = 0
+                    self.y_coordinates = last_emoji.y_coordinates +1
+            else:
+                # If no emojis exist, initialize position
                 self.x_coordinates = 0
-                self.y_coordinates = last_emoji.y_coordinates +1
-        else:
-            # If no emojis exist, initialize position
-            self.x_coordinates = 0
-            self.y_coordinates = 0
-        if self.y_coordinates >=4:
-            self.save()
-            return False  # Indicate failure
-        # Check if the new position is still within the canvas limits
-        self.save()
-        return True  # Indicate success
+                self.y_coordinates = 0
+            if self.y_coordinates >=4:
+                return False  # Indicate failure
+            # Check if the new position is still within the canvas limits
+            return True  # Indicate success
     
     def allocate_time_period(self):
         #extract the time part from the datetime object
@@ -117,5 +117,4 @@ class Emoji(Model):
         #Evening: 6:00 PM to 3:59 AM
         else:
             self.time_period = "Evening"
-        self.save()
     

@@ -90,7 +90,7 @@ def new_emoji(args):
             return {'Error': 'The canva size has reached to its maximum'}
     elif Canva.objects.filter(id=args['access_code']).exists() == False:
         return {'Error': 'Access code does not exit'}
-
+        
 @route_post(BASE_URL + 'new/canva')
 def new_canva(args):
     new_canva = Canva(
