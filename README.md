@@ -5,6 +5,8 @@
 >
 > If you're interested in how to format markdown, click [here](https://www.markdownguide.org/basic-syntax/#images-1)
 
+#add sucess json, error json, and potential use to the overview
+
 ## API Overview
 The "Mood of the Day" API is a collaborative platform inspired by Reddit r/place, allowing users to express their daily moods through emojis. Friends can participate together, contributing their own emojis to create a shared canva of collective feelings. Access to the API is completely private, as friends can only join through a unique access code, ensuring that mood sharing remains within trusted circles. By tracking and showcasing moods, this API promotes emotional well-being and enhances communication among users and their friends or family.
 
@@ -31,6 +33,8 @@ The "Mood of the Day" API is a collaborative platform inspired by Reddit r/place
 |x_coordinates |Int |Stores the x_coordinates of the emoji on the canva|1
 |y_coordinates |Int |Stores the y_coordinates of the emoji on the canva|2
 |canva      |ForeignKey |Stores the canva object that belongs to this emoji object, which two databases are linked together|To access the id of the canva, simply type emoji.canva.id
+|input_time |Str |Stores the time that the user added the emoji to the database
+|time_period |Str |Based on the `input_time`, allocates it into "Morning", "Afternoon", "Evening"
 
 Please note that the x and y coordinates of the emoji is automatically allocated, which the user is not allowed to change its position
 
@@ -39,6 +43,7 @@ Please note that the x and y coordinates of the emoji is automatically allocated
 |str   	|self   	|Returns the object in a readable and informal, string representation 	|
 |emoji_json_response |self    |Return the object in json response format, simular to a dictonary
 |setting_position |self, access_code |Automatically sets the position (x and y coordinates) of the emoji based on the position of the last emoji inputed of the specific canva
+|allocate_time_period |self |Based on the `input_time`, allocates the time period into "Morning", "Afternoon", "Evening"
 
 #### Canva Model
 ***Field:***
@@ -49,7 +54,6 @@ Please note that the x and y coordinates of the emoji is automatically allocated
 |like |Int |Stores the number of likes of that specific canva|0
 |popularity_percentage |Float |Stores the percentage of popularity of the canva|50.0
 |created_time |Str |Stores the created time of the canva|2024-10-20 04:21:55.161606
-|time_period  |Str |Sorts each edit time of the canva into "Morning", "Afternoon" and "Evening"|
 
 |Method   	|Parameter   	|Description   	|
 |---	|---	|---	|
@@ -57,7 +61,6 @@ Please note that the x and y coordinates of the emoji is automatically allocated
 |canva_json_response |self    |Return the object in json response format, simular to a dictonary
 |check_twentyfourhour_time_entry |self |Checks if the last editing time of the user is more than 24 hours
 |check_time_period_entry |self |Checks if a specific user has already edit the canva in a time period (E.g. Morning, Afternoon or Evening)
-|allocate_time_period|self |Based on the last editing time, it allocates it into either "Morning", "Afternoon" and "Evening"
 |increase_like |self    |Increases number of `like` of the specific canva
 |add_view_and_calculating_popularity |self |Increases number of `view` of the specific canva and calculates the `popularity_percentage` by simply dividing `like` by `view`
 

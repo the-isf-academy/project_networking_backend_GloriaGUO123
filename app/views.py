@@ -19,48 +19,42 @@ def all_emoji(args):
     elif Canva.objects.filter(id=args['access_code']).exists() == False:
         return {'Error': 'Access code does not exit'}
 
-# # Try to see how to accept multiple values in one parameter
-# @route_get(BASE_URL + 'all/canva', args = {'access_code':int})
-# def all_canvas(args):
-#     canvas_list = []
-#     for canva in Canva.objects.filter(id=args['access_code']):
-#         canva.add_view_and_calculating_popularity()
-#         canvas_list.append(canva.canva_json_response())
-#     if canvas_list != []:
-#         return {'Canvas': canvas_list}
-#     elif canvas_list == []:
-#         return {'Error': 'No canvas exist currently'}
-
-@route_get(BASE_URL + 'all/canva')
+@route_get(BASE_URL + 'all/canva', args = {'access_code':str})
 def all_canvas(args):
+    access_code_list = args['access_code'].split(",")
     canvas_list = []
-    for canva in Canva.objects.all():
-        canva.add_view_and_calculating_popularity()
-        canvas_list.append(canva.canva_json_response())
+    for access_code in access_code_list:
+        for canva in Canva.objects.filter(id=access_code):
+            canva.add_view_and_calculating_popularity()
+            canvas_list.append(canva.canva_json_response())
     if canvas_list != []:
         return {'Canvas': canvas_list}
     elif canvas_list == []:
         return {'Error': 'No canvas exist currently'}
 
-@route_get(BASE_URL + 'all/canva/popularity')
+@route_get(BASE_URL + 'all/canva/popularity',  args = {'access_code':str})
 def all_canvas_most_popularity(args):
+    access_code_list = args['access_code'].split(",")
     canvas_list = []
     # Only returns the top 5 most popular canva based on the percentage of popularity
-    for canva in Canva.objects.order_by('-popularity_percentage')[:5]:
-        canva.add_view_and_calculating_popularity()
-        canvas_list.append(canva.canva_json_response())
+    for access_code in access_code_list:
+        for canva in Canva.objects.filter(id=access_code).order_by('-popularity_percentage')[:5]:
+            canva.add_view_and_calculating_popularity()
+            canvas_list.append(canva.canva_json_response())
     if canvas_list != []:
         return {'Canvas': canvas_list}
     elif canvas_list == []:
         return {'Error': 'No canvas exist currently'}
 
-@route_get(BASE_URL + 'all/canva/recent')
+@route_get(BASE_URL + 'all/canva/recent',  args = {'access_code':str})
 def all_canvas_most_recent(args):
+    access_code_list = args['access_code'].split(",")
     canvas_list = []
     # Only returns the top 5 most popular canva based on the created time
-    for canva in Canva.objects.order_by('-created_time')[:5]:
-        canva.add_view_and_calculating_popularity()
-        canvas_list.append(canva.canva_json_response())
+    for access_code in access_code_list:
+        for canva in Canva.objects.filter(id=access_code).order_by('-created_time')[:5]:
+            canva.add_view_and_calculating_popularity()
+            canvas_list.append(canva.canva_json_response())
     if canvas_list != []:
         return {'Canvas': canvas_list}
     elif canvas_list == []:
@@ -108,9 +102,25 @@ def new_canva(args):
 def like_canva(args):
     if Canva.objects.filter(id=args['access_code']).exists():
         chosen_canva = Canva.objects.get(id=args['access_code'])
-        # Why can't I chain them together
         chosen_canva.increase_like()
         chosen_canva.add_view_and_calculating_popularity()
         return {'Canva':chosen_canva.canva_json_response()}
     else: 
         return {'Error': "No canva exist"}
+
+@route_post(BASE_URL + 'delete/canva', args = {'access_code':int})
+def delete_canva(args):
+    if Canva.objects.filter(id=args['access_code']).exists():
+        Canva.objects.get(id=args['access_code']).delete()
+        return {'Sucess':'User has already deleted the canva'}
+    else: 
+        return {'Error': "Unsucessful, No canva exist"}
+
+#unchecked
+@route_post(BASE_URL + 'delete/emoji', args = {'access_code':int, 'id':int})
+def delete_emoji(args):
+    if Canva.objects.filter(id=args['access_code']).exists() == True:
+        selected_canva = Canva.objects.get(id=args['access_code'])
+        selected_canva.emojis.get(id=args['id']).delete()
+    elif Canva.objects.filter(id=args['access_code']).exists() == False:
+        return {'Error': 'Access code does not exit'}
