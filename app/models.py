@@ -10,7 +10,7 @@ class Canva(Model):
     popularity_percentage = FloatField()
 
     def __str__(self):
-        return f"id: {self.id}, like:{self.like}, view:{self.view}, created_time:{self.created_time}"
+        return f"id: {self.id}, like:{self.like}, view:{self.view}, created_time:{self.created_time}, popularity_percent: {self.popularity_percentage}"
 
     def canva_json_response(self):
         return {
@@ -117,4 +117,21 @@ class Emoji(Model):
         #Evening: 6:00 PM to 3:59 AM
         else:
             self.time_period = "Evening"
-    
+
+    def change(self,input_emoji):
+        current_time = datetime.now().time()
+        if time(4, 0) <= current_time < time(12, 0):
+            time_period = "Morning"
+        #Afternoon: 12:00 PM to 5:59 PM
+        elif time(12, 0) <= current_time < time(18, 0):
+            time_period = "Afternoon"
+        #Evening: 6:00 PM to 3:59 AM
+        else:
+            time_period = "Evening"
+        if self.time_period == time_period:
+            self.emoji = input_emoji
+            self.input_time = datetime.now()
+            self.save()
+            return True
+        else:
+            return False

@@ -32,15 +32,13 @@ def all_canvas(args):
     elif canvas_list == []:
         return {'Error': 'No canvas exist currently'}
 
-@route_get(BASE_URL + 'all/canva/popularity',  args = {'access_code':str})
-def all_canvas_most_popularity(args):
+@route_get(BASE_URL + 'all/canva/recent',  args = {'access_code':str})
+def all_canvas_most_popular(args):
     access_code_list = args['access_code'].split(",")
     canvas_list = []
+    # Only returns the top 5 most popular canva based on the created time
     for access_code in access_code_list:
-        selected_canva_list = Canva.objects.filter(id=access_code)
-        # Only returns the top 5 most popular canva based on the percentage of popularity
-        for canva in selected_canva_list.order_by('-popularity_percentage')[:5]:
-            print(canva)
+        for canva in Canva.objects.filter(id=access_code).order_by('-popularity_percentage')[:5]:
             canva.add_view_and_calculating_popularity()
             canvas_list.append(canva.canva_json_response())
     if canvas_list != []:
@@ -52,7 +50,7 @@ def all_canvas_most_popularity(args):
 def all_canvas_most_recent(args):
     access_code_list = args['access_code'].split(",")
     canvas_list = []
-    # Only returns the top 5 most popular canva based on the created time
+    # Only returns the top 5 most recent canva based on the created time
     for access_code in access_code_list:
         for canva in Canva.objects.filter(id=access_code).order_by('-created_time')[:5]:
             canva.add_view_and_calculating_popularity()
@@ -99,6 +97,20 @@ def new_canva(args):
     new_canva.add_view_and_calculating_popularity()
     new_canva.save()
     return {'Canva': new_canva.canva_json_response()}
+
+@route_post(BASE_URL + 'update/emoji', args={'change_emoji':str, 'id': int, 'access_code':str})
+def update_emoji(args):
+    if Canva.objects.filter(id=args['access_code']).exists():
+        if Emoji.objects.filter(id=args['id']).exists() == True:
+            selected_emoji = Emoji.objects.get(id=args['id'])
+            if selected_emoji.change(args['change_emoji']) == True:
+                return {'Emoji': selected_emoji.emoji_json_response()}
+            else:
+                return {'Error': 'Failed to change emoji, can only change in same time period'}
+        elif Emoji.objects.filter(id=args['id']).exists() == False:
+            return {'Error': 'Emoji not found'}
+    elif Canva.objects.filter(id=args['access_code']).exists() == False:
+        return {'Error': 'Access code does not exist'}
 
 @route_post(BASE_URL + 'likes', args = {'access_code':int})
 def like_canva(args):
