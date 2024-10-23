@@ -1,7 +1,7 @@
 # models.py
 
 from banjo.models import Model, StringField, IntegerField, FloatField, BooleanField, ForeignKey
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, timezone
 
 class Canva(Model): 
     like = IntegerField()
@@ -34,7 +34,7 @@ class Canva(Model):
         self.save()
 
     def check_twentyfourhour_time_entry(self):
-        current_time = datetime.now()
+        current_time = datetime.now(timezone.utc) +timedelta(hours=8)
         # Convert create_time into a datetime object
         created_time_datetime_object = datetime.strptime(self.created_time, '%Y-%m-%d %H:%M:%S.%f')
         time_difference = current_time - created_time_datetime_object
@@ -42,7 +42,8 @@ class Canva(Model):
         return time_difference < timedelta(hours=12)
 
     def check_time_period_entry(self, input_username):
-        current_time = datetime.now().time()
+        current_time = datetime.now(timezone.utc) +timedelta(hours=8)
+        current_time = current_time.time()
         if time(4, 0) <= current_time < time(12, 0):
             current_time_period = "Morning"
         #Afternoon: 12:00 PM to 5:59 PM
@@ -119,7 +120,8 @@ class Emoji(Model):
             self.time_period = "Evening"
 
     def change(self,input_emoji):
-        current_time = datetime.now().time()
+        current_time = datetime.now(timezone.utc)+timedelta(hours=8)
+        current_time = current_time.time()
         if time(4, 0) <= current_time < time(12, 0):
             time_period = "Morning"
         #Afternoon: 12:00 PM to 5:59 PM
@@ -130,7 +132,7 @@ class Emoji(Model):
             time_period = "Evening"
         if self.time_period == time_period:
             self.emoji = input_emoji
-            self.input_time = datetime.now()
+            self.input_time = datetime.now(timezone.utc) +timedelta(hours=8)
             self.save()
             return True
         else:

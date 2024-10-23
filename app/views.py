@@ -3,7 +3,7 @@
 from banjo.urls import route_get, route_post
 from settings import BASE_URL
 from .models import Emoji, Canva
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 @route_get(BASE_URL + 'all/emoji', args = {'access_code':int})
 def all_emoji(args):
@@ -32,15 +32,17 @@ def all_canvas(args):
     elif canvas_list == []:
         return {'Error': 'No canvas exist currently'}
 
-@route_get(BASE_URL + 'all/canva/recent',  args = {'access_code':str})
+@route_get(BASE_URL + 'all/canva/popularity',  args = {'access_code':str})
 def all_canvas_most_popular(args):
     access_code_list = args['access_code'].split(",")
     canvas_list = []
-    # Only returns the top 5 most popular canva based on the created time
-    for access_code in access_code_list:
-        for canva in Canva.objects.filter(id=access_code).order_by('-popularity_percentage')[:5]:
+    # Only returns the top 5 most popular canva based on the popularity percentage
+    for canva in Canva.objects.order_by('-popularity_percentage')[:5]:
+        if str(canva.id) in access_code_list:
             canva.add_view_and_calculating_popularity()
             canvas_list.append(canva.canva_json_response())
+        else:
+            return {'Error': 'Access code not found'}
     if canvas_list != []:
         return {'Canvas': canvas_list}
     elif canvas_list == []:
@@ -51,10 +53,12 @@ def all_canvas_most_recent(args):
     access_code_list = args['access_code'].split(",")
     canvas_list = []
     # Only returns the top 5 most recent canva based on the created time
-    for access_code in access_code_list:
-        for canva in Canva.objects.filter(id=access_code).order_by('-created_time')[:5]:
+    for canva in Canva.objects.order_by('-created_time')[:5]:
+        if str(canva.id) in access_code_list:
             canva.add_view_and_calculating_popularity()
             canvas_list.append(canva.canva_json_response())
+        else:
+            return {'Error': 'Access code not found'}
     if canvas_list != []:
         return {'Canvas': canvas_list}
     elif canvas_list == []:
@@ -68,8 +72,8 @@ def new_emoji(args):
             emoji = args['emoji'],
             username = args['username'],
             canva = selected_canva,
-            #Note: Make it so that it maches with HK
-            input_time = datetime.now()
+            #UTC + 8hours = Hong Kong time
+            input_time = datetime.now(timezone.utc) +timedelta(hours=8)
             )
         new_emoji.allocate_time_period()
         new_emoji.setting_position(args['access_code'])
@@ -91,7 +95,7 @@ def new_canva(args):
         like = 0,
         view = 0,
         #Gets the current time of the user when they add a new canva (including date and time)
-        created_time = datetime.now(),
+        created_time = datetime.now(timezone.utc) +timedelta(hours=8),
         popularity_percentage = 0.0
     )
     new_canva.add_view_and_calculating_popularity()
