@@ -5,20 +5,21 @@
 >
 > If you're interested in how to format markdown, click [here](https://www.markdownguide.org/basic-syntax/#images-1)
 
-#add sucess json, error json, and potential use to the overview
+#add sucess json, error json, and 
 
 ## API Overview
-The "Mood of the Day" API is a collaborative platform inspired by Reddit r/place, allowing users to express their daily moods through emojis. Friends can participate together, contributing their own emojis to create a shared canva of collective feelings. Access to the API is completely private, as friends can only join through a unique access code, ensuring that mood sharing remains within trusted circles. By tracking and showcasing moods, this API promotes emotional well-being and enhances communication among users and their friends or family.
+The "Mood of the Day" API is a collaborative platform inspired by Reddit r/place, allowing users to express their daily moods through emojis. Friends can participate together, contributing their own emojis to create a shared canva of collective feelings. Access to the API is completely private, as friends can only join through a unique access code, ensuring that mood sharing remains within trusted circles. By tracking and showcasing moods through visualisation, this API promotes emotional well-being and enhances communication among users and their friends or family.
 
 **Simple Instruction:**
-1. User will need to create a canva first (at least one, multiple canvas are also allowed)
+1. User MUST create a canva first (at least one, multiple canvas are also allowed) before starting to add emojis
 2. User can add emojis to a specific canva, and collaborate with friends, family to form a art piece
+3. If users accidentally create an unwanted canva or emoji, they can also delete it. 
 3. User can view all the emojis added to a canva or all the canvas that the user has created, but access code will be needed to ensure privacy
 
 **Important Notice**
 - For each canva, each user can only add in ONE new emoji during Morning (4:00 AM to 11:59 AM), Afternoon (12:00 PM to 5:59 PM), and Evening (6:00 PM to 3:59 AM)
 - Please note that the maximum canva size is 4x4 (meaning that ONLY 16 emojis are allowed for each canva)
-- The editing access of the canva will be locked after 24 hours of the `created_time` 
+- The editing access of the canva will be locked after 24 hours of the `created_time`, as each canva should represent the mood of the day. 
 - Please remember the access code for each canva or else the user can not access the canva anymore
 
 ### Model
@@ -26,15 +27,15 @@ The "Mood of the Day" API is a collaborative platform inspired by Reddit r/place
 #### Emoji Model
 ***Field:***
 
-|Field   	|Type   	|Description   	|Example|
+|Field   	|Data Type   	|Description   	|Example|
 |---	|---	|---	|---	|
 |emoji   	|Str   	|Stores the emoji that user enters   	|😀
 |username   |Str    |Stores the username of the user that enters the emoji|Gloria
 |x_coordinates |Int |Stores the x_coordinates of the emoji on the canva|1
 |y_coordinates |Int |Stores the y_coordinates of the emoji on the canva|2
 |canva      |ForeignKey |Stores the canva object that belongs to this emoji object, which two databases are linked together|To access the id of the canva, simply type emoji.canva.id
-|input_time |Str |Stores the time that the user added the emoji to the database
-|time_period |Str |Based on the `input_time`, allocates it into "Morning", "Afternoon", "Evening"
+|input_time |Str |Stores the time that the user added the emoji to the database| 2024-10-20 04:21:55.161606
+|time_period |Str |Based on the `input_time`, allocates it into "Morning", "Afternoon", "Evening"|Morning
 
 Please note that the x and y coordinates of the emoji is automatically allocated, which the user is not allowed to change its position
 
@@ -48,7 +49,7 @@ Please note that the x and y coordinates of the emoji is automatically allocated
 #### Canva Model
 ***Field:***
 
-|Field   	|Type   	|Description   	|Example
+|Field   	|Data Type   	|Description   	|Example
 |---	|---	|---	|---	|
 |view   |Int    |Stores the number of views of that specific canva|0
 |like |Int |Stores the number of likes of that specific canva|0
@@ -59,56 +60,80 @@ Please note that the x and y coordinates of the emoji is automatically allocated
 |---	|---	|---	|
 |str   	|self   	|Returns the object in a readable and informal, string representation 	|
 |canva_json_response |self    |Return the object in json response format, simular to a dictonary
-|check_twentyfourhour_time_entry |self |Checks if the last editing time of the user is more than 24 hours
-|check_time_period_entry |self |Checks if a specific user has already edit the canva in a time period (E.g. Morning, Afternoon or Evening)
+|check_twentyfourhour_time_entry |self |Checks if the `created_time` is more than 24 hours compared with the current time
+|check_time_period_entry |self, input_username|Checks if a specific user has already edit the canva in a time period (E.g. Morning, Afternoon or Evening)
 |increase_like |self    |Increases number of `like` of the specific canva
 |add_view_and_calculating_popularity |self |Increases number of `view` of the specific canva and calculates the `popularity_percentage` by simply dividing `like` by `view`
 
-Please note that the ID of the canva is refered as access code in the frontend
+Please note that the ID of the canva is refered as access code of the canva in the frontend
 
 ### Endpoints
 ---
+
+***Access Code Format Guide***
+
+For endpoints that ALLOWS multiple access code to be inputed, please do remember that the format to input the access code is crutial, or else it would cause an error. Essentially, user must place `,` (commas) between each access code, or else it will not recognise it as individual integers, cauing error to happen. 
+
+*Examples*
+```
+✅:
+access_code = 1,2,5,6
+access_code = 1
+access_code = 9,1
+access_code = 1    ,      2   , 3
+
+❌:
+access_code = 1`2`2
+access_code = 1\2\3
+access_code = 1 2 3
+```
 
 ***`GET` Request:***
 #### 1. View previous emojis: 
 Returns all the emojis of a specific canva
 
 **GET Request: `/all/emojis`**
-|Payload  	|Type   	|Description   	|   	|   	|
+|Payload  	|Data Type   	|Description   	|   	|   	|
 |---	        |---	    |---	        |---	|---	|
 |access_code   	|Int   	    |To view all the emojis that are inputed in a specific canva, user needs to input the access code of the desired canva   	
 
 *Example:* 
 ```
 Get Request: http://127.0.0.1:5000/moodboard/all/emoji 
-Payload: access_code=1
+Payload: access_code=2
 
 {
   "Emojis": [
     {
-      "id": 1,
+      "id": 3,
       "emoji": "🙃",
       "username": "Gloria",
       "x_coordinates": 0,
       "y_coordinates": 0,
-      "access_code": 1
+      "access_code": 2,
+      "input_time": "2024-10-22 23:19:58.354520",
+      "time_period": "Evening"
     },
     {
-      "id": 2,
-      "emoji": "😌",
-      "username": "Adrianne",
+      "id": 4,
+      "emoji": "🙃",
+      "username": "Amanda",
       "x_coordinates": 1,
       "y_coordinates": 0,
-      "access_code": 1
+      "access_code": 2,
+      "input_time": "2024-10-22 23:20:02.826174",
+      "time_period": "Evening"
     },
     {
-      "id": 3,
-      "emoji": "😚",
-      "username": "Amanda",
+      "id": 5,
+      "emoji": "🙃",
+      "username": "Joyce",
       "x_coordinates": 2,
       "y_coordinates": 0,
-      "access_code": 1
-    },
+      "access_code": 2,
+      "input_time": "2024-10-22 23:20:08.282238",
+      "time_period": "Evening"
+    }
   ]
 }
 ```
@@ -119,42 +144,44 @@ Returns all the canva that the user has access with
 **GET Request: `/all/canva`**
 |Payload   	|Type   	|Description   	|   	|   	|
 |---	|---	|---	|---	|---	|
-|access_code   	|Int   	|To view all the canvas that user has acess with, user need to input all of the acess code.   	|    	|   	|
+|access_code   	|Str   	|To view all the canvas that user has acess with, user need to input all of the acess code.   	|    	|   	|
 
-*Example:* 
+*Please note that the format of inputing the access code is crutial, else it would cause an error (May refer back to **Access Code Format Guide** on top). 
+
+
+Example:* 
 ```
 Get Request: http://127.0.0.1:5000/moodboard/all/canva 
-Payload: access_code=1,2,3
+Payload: access_code=2,3,4
 
 {
   "Canvas": [
     {
-      "id": 1,
-      "like": 0,
-      "view": 2,
-      "created_time": "2024-10-21 04:30:24.806533",
-      "popularity_percentage": 0,
-      "access_code": 1
-    },
-    {
       "id": 2,
       "like": 0,
-      "view": 2,
-      "created_time": "2024-10-21 04:30:27.804994",
+      "view": 19,
+      "created_time": "2024-10-22 19:52:12.198770",
       "popularity_percentage": 0,
       "access_code": 2
     },
     {
       "id": 3,
       "like": 0,
-      "view": 2,
-      "created_time": "2024-10-21 04:30:29.510287",
+      "view": 18,
+      "created_time": "2024-10-22 19:52:12.759492",
       "popularity_percentage": 0,
       "access_code": 3
+    },
+    {
+      "id": 4,
+      "like": 0,
+      "view": 15,
+      "created_time": "2024-10-22 19:52:13.316877",
+      "popularity_percentage": 0,
+      "access_code": 4
     }
   ]
 }
-
 ```
 
 #### 3. View previous canvas with highest popularity: 
@@ -163,7 +190,9 @@ Returns the top 5 canvas with the highest popularity
 **GET Request: `/all/canva/popularity`**
 |Payload   	|Type   	|Description   	|   	|   	|
 |---	|---	|---	|---	|---	|
-|access_code   	|Int   	|To view the canvas with highest popularity percentage (top 5 only), user needs to all the access codes   	|    	|   	|
+|access_code   	|Str  	|To view the canvas with highest popularity percentage (top 5 only), user needs to all the access codes   	|    	|   	|
+
+*Please note that the format of inputing the access code is crutial, else it would cause an error (May refer back to **Access Code Format Guide** on top). 
 
 *Example:* 
 ```

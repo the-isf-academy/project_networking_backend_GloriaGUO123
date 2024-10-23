@@ -36,9 +36,11 @@ def all_canvas(args):
 def all_canvas_most_popularity(args):
     access_code_list = args['access_code'].split(",")
     canvas_list = []
-    # Only returns the top 5 most popular canva based on the percentage of popularity
     for access_code in access_code_list:
-        for canva in Canva.objects.filter(id=access_code).order_by('-popularity_percentage')[:5]:
+        selected_canva_list = Canva.objects.filter(id=access_code)
+        # Only returns the top 5 most popular canva based on the percentage of popularity
+        for canva in selected_canva_list.order_by('-popularity_percentage')[:5]:
+            print(canva)
             canva.add_view_and_calculating_popularity()
             canvas_list.append(canva.canva_json_response())
     if canvas_list != []:
@@ -116,11 +118,14 @@ def delete_canva(args):
     else: 
         return {'Error': "Unsucessful, No canva exist"}
 
-#unchecked
-@route_post(BASE_URL + 'delete/emoji', args = {'access_code':int, 'id':int})
+@route_post(BASE_URL + 'delete/emoji', args={'access_code': int, 'id': int})
 def delete_emoji(args):
     if Canva.objects.filter(id=args['access_code']).exists() == True:
-        selected_canva = Canva.objects.get(id=args['access_code'])
-        selected_canva.emojis.get(id=args['id']).delete()
+        selected_emoji = Emoji.objects.filter(id=args['id'], canva_id=args['access_code'])
+        if selected_emoji:
+            selected_emoji.delete()
+            return {'Success': 'Emoji has been deleted'}
+        else:
+            return {'Error': 'Emoji not found or does not belong to this canvas'}
     elif Canva.objects.filter(id=args['access_code']).exists() == False:
-        return {'Error': 'Access code does not exit'}
+        return {'Error': 'Access code does not exist'}
