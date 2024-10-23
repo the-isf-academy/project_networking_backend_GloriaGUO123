@@ -30,7 +30,7 @@ def all_canvas(args):
     if canvas_list != []:
         return {'Canvas': canvas_list}
     elif canvas_list == []:
-        return {'Error': 'No canvas exist currently'}
+        return {'Error': 'None of the canvas exist'}
 
 @route_get(BASE_URL + 'all/canva/popularity',  args = {'access_code':str})
 def all_canvas_most_popular(args):
@@ -41,12 +41,10 @@ def all_canvas_most_popular(args):
         if str(canva.id) in access_code_list:
             canva.add_view_and_calculating_popularity()
             canvas_list.append(canva.canva_json_response())
-        else:
-            return {'Error': 'Access code not found'}
     if canvas_list != []:
         return {'Canvas': canvas_list}
     elif canvas_list == []:
-        return {'Error': 'No canvas exist currently'}
+        return {'Error': 'No canvas exist currently or access code not found'}
 
 @route_get(BASE_URL + 'all/canva/recent',  args = {'access_code':str})
 def all_canvas_most_recent(args):
@@ -57,12 +55,10 @@ def all_canvas_most_recent(args):
         if str(canva.id) in access_code_list:
             canva.add_view_and_calculating_popularity()
             canvas_list.append(canva.canva_json_response())
-        else:
-            return {'Error': 'Access code not found'}
     if canvas_list != []:
         return {'Canvas': canvas_list}
     elif canvas_list == []:
-        return {'Error': 'No canvas exist currently'}
+        return {'Error': 'No canvas exist currently or access code not found'}
 
 @route_post(BASE_URL + 'new/emoji', args={'emoji':str, 'username': str, 'access_code':int})
 def new_emoji(args):

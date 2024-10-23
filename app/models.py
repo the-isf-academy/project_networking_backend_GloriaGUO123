@@ -36,10 +36,10 @@ class Canva(Model):
     def check_twentyfourhour_time_entry(self):
         current_time = datetime.now(timezone.utc) +timedelta(hours=8)
         # Convert create_time into a datetime object
-        created_time_datetime_object = datetime.strptime(self.created_time, '%Y-%m-%d %H:%M:%S.%f')
+        created_time_datetime_object = datetime.strptime(self.created_time, '%Y-%m-%d %H:%M:%S.%f%z')
         time_difference = current_time - created_time_datetime_object
         # Check if the time difference is less than 24 hours
-        return time_difference < timedelta(hours=12)
+        return time_difference < timedelta(hours=24)
 
     def check_time_period_entry(self, input_username):
         current_time = datetime.now(timezone.utc) +timedelta(hours=8)
