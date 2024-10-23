@@ -52,10 +52,8 @@ class Canva(Model):
         #Evening: 6:00 PM to 3:59 AM
         else:
             current_time_period = "Evening"
-        print(f"Current time: {current_time}, Time period: {current_time_period}, User: {input_username}")
         # Checks if a specific user has already added an Emoji in the current time period
         for emoji in Emoji.objects.filter(canva=self, username=input_username):
-            print(f"Current time: {current_time}, Time period: {current_time_period}, User: {input_username}, Emoji Time: {emoji.time_period}")
             if emoji.time_period == current_time_period:
                 return False
         return True
@@ -86,7 +84,6 @@ class Emoji(Model):
     
     def setting_position(self, access_code):
         # The size of the canva is 4x4
-        # Ask about this line of code
             last_emoji = Emoji.objects.filter(canva=access_code).last()
             if last_emoji:
                 if last_emoji.x_coordinates <3:

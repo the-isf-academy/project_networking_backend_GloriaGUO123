@@ -5,8 +5,6 @@
 >
 > If you're interested in how to format markdown, click [here](https://www.markdownguide.org/basic-syntax/#images-1)
 
-#add sucess json, error json, and 
-
 ## API Overview
 The "Mood of the Day" API is a collaborative platform inspired by Reddit r/place, allowing users to express their daily moods through emojis. Friends can participate together, contributing their own emojis to create a shared canva of collective feelings. Access to the API is completely private, as friends can only join through a unique access code, ensuring that mood sharing remains within trusted circles. By tracking and showcasing moods through visualisation, this API promotes emotional well-being and enhances communication among users and their friends or family.
 
@@ -45,6 +43,7 @@ Please note that the x and y coordinates of the emoji is automatically allocated
 |emoji_json_response |self    |Return the object in json response format, simular to a dictonary
 |setting_position |self, access_code |Automatically sets the position (x and y coordinates) of the emoji based on the position of the last emoji inputed of the specific canva
 |allocate_time_period |self |Based on the `input_time`, allocates the time period into "Morning", "Afternoon", "Evening"
+|change |self, input_emoji |Allows the user to change their input for the emoji during the same time period ONLY
 
 #### Canva Model
 ***Field:***
@@ -72,7 +71,7 @@ Please note that the ID of the canva is refered as access code of the canva in t
 
 ***Access Code Format Guide***
 
-For endpoints that ALLOWS multiple access code to be inputed, please do remember that the format to input the access code is crutial, or else it would cause an error. Essentially, user must place `,` (commas) between each access code, or else it will not recognise it as individual integers, cauing error to happen. 
+For endpoints that ALLOWS multiple access code to be inputed, please do remember that the format to input the access code is crutial, or else it would cause an error. Essentially, user must place `,` (commas) between each access code, or else it will not recognise it as individual integers, causing error to happen. 
 
 *Examples*
 ```
@@ -116,7 +115,7 @@ Payload: access_code=2
     },
     {
       "id": 4,
-      "emoji": "🙃",
+      "emoji": "🥺",
       "username": "Amanda",
       "x_coordinates": 1,
       "y_coordinates": 0,
@@ -126,7 +125,7 @@ Payload: access_code=2
     },
     {
       "id": 5,
-      "emoji": "🙃",
+      "emoji": "😳",
       "username": "Joyce",
       "x_coordinates": 2,
       "y_coordinates": 0,
@@ -142,7 +141,7 @@ Payload: access_code=2
 Returns all the canva that the user has access with
 
 **GET Request: `/all/canva`**
-|Payload   	|Type   	|Description   	|   	|   	|
+|Payload   	|Data Type   	|Description   	|   	|   	|
 |---	|---	|---	|---	|---	|
 |access_code   	|Str   	|To view all the canvas that user has acess with, user need to input all of the acess code.   	|    	|   	|
 
@@ -188,7 +187,7 @@ Payload: access_code=2,3,4
 Returns the top 5 canvas with the highest popularity
 
 **GET Request: `/all/canva/popularity`**
-|Payload   	|Type   	|Description   	|   	|   	|
+|Payload   	|Data Type   	|Description   	|   	|   	|
 |---	|---	|---	|---	|---	|
 |access_code   	|Str  	|To view the canvas with highest popularity percentage (top 5 only), user needs to all the access codes   	|    	|   	|
 
@@ -196,7 +195,7 @@ Returns the top 5 canvas with the highest popularity
 
 *Example:* 
 ```
-Get Request: http://127.0.0.1:5000/moodboard/all/canva 
+Get Request: http://127.0.0.1:5000/moodboard/all/canva/popularity 
 Payload: access_code=1,2,3
 
 {
@@ -233,16 +232,53 @@ Payload: access_code=1,2,3
 Returns the top 5 most recent canvas
 
 **GET Request: `/all/canvas/recent`**
-|Payload  	|Type   	|Description   	|   	|   	|
+|Payload  	|Data Type   	|Description   	|   	|   	|
 |---	|---	|---	|---	|---	|
-|access_code   	|Int   	|To view the canvas that are most recent (top 5), user needs to all the access codes   	|    	|   	|
+|access_code   	|Str   	|To view the canvas that are most recent (top 5), user needs to all the access codes   	|    	|   	|
+
+*Please note that the format of inputing the access code is crutial, else it would cause an error (May refer back to **Access Code Format Guide** on top). 
+
+*Example:* 
+```
+Get Request: http://127.0.0.1:5000/moodboard/all/canva/recent 
+Payload: access_code=1,2,4
+
+{
+  "Canvas": [
+    {
+      "id": 4,
+      "like": 0,
+      "view": 4,
+      "created_time": "2024-10-23 21:57:54.655358+00:00",
+      "popularity_percentage": 0,
+      "access_code": 4
+    },
+    {
+      "id": 3,
+      "like": 0,
+      "view": 4,
+      "created_time": "2024-10-23 21:57:53.866276+00:00",
+      "popularity_percentage": 0,
+      "access_code": 3
+    },
+    {
+      "id": 1,
+      "like": 0,
+      "view": 5,
+      "created_time": "2024-10-23 21:57:52.573614+00:00",
+      "popularity_percentage": 0,
+      "access_code": 1
+    }
+  ]
+}
+```
 ---
 ***`POST` Request:***
 #### 1. Create a canva: 
 User can create mutiple canva with different group of people, for example friends and family 
 
 **POST Request: `/new/canva`**
-|Payload   	|Type   	|Description   	|   	|   	|
+|Payload   	|Data Type   	|Description   	|   	|   	|
 |---	|---	|---	|---	|---	|
 |None   |None   |None
 *No parameter needed for this endpoint
@@ -257,7 +293,7 @@ Payload: None
     "id": 3,
     "like": 0,
     "view": 1,
-    "created_time": "2024-10-21T04:30:29.510",
+    "created_time": "2024-10-21T14:30:29.510",
     "popularity_percentage": 0,
     "access_code": 3
   }
@@ -268,7 +304,7 @@ Payload: None
 Adding a new emoji to the canva, to represent the current mood of a user
 
 **POST Request: `/new/emoji`**
-|Payload   	|Type   	|Description   	|   	|   	|
+|Payload   	|Data Type   	|Description   	|   	|   	|
 |---	|---	|---	|---	|---	|
 |access_code   	|Int   	|To acess a specific canva, user need to first input the access code of that canva   	|    	|   	|
 emoji           |Str    |User needs to input the emoji that represents the current mood (E.g. 🥹)
@@ -295,7 +331,7 @@ Payload: access_code=1, emoji=😇, username=Gloria
 Through this endpoint, user can add likes to a specific canva
 
 **POST Request: `/likes`**
-|Payload   	|Type   	|Description   	|   	|   	|
+|Payload   	|Data Type   	|Description   	|   	|   	|
 |---	|---	|---	|---	|---	|
 |access_code   	|Int   	|User needs to enter the access code of the canva that they want to like
 
@@ -316,6 +352,76 @@ Payload: access_code=1
   }
 }
 ```
+
+#### 4. Updating an emoji during same time period: 
+User can update the emoji based on their current mood, as long as it is still within the same time period
+
+**POST Request: `update/emoji`**
+|Payload   	|Data Type   	|Description   	|   	|   	|
+|---	|---	|---	|---	|---	|
+|access_code   	|Int   	|User needs to enter the access code of the canva that they want to access
+|id |Int |Users need to enter the id of the emoji that they would like to change
+|change_emoji|Str|Input the emoji that user would like to replace into
+
+*Example:* 
+```
+Post Request: http://127.0.0.1:5000/moodboard/update/emoji
+Payload: access_code=3, change_emoji=🙃, id=15
+
+{
+  "Emoji": {
+    "id": 16,
+    "emoji": "🙃",
+    "username": "cc",
+    "x_coordinates": 3,
+    "y_coordinates": 3,
+    "access_code": 1,
+    "input_time": "2024-10-23T22:17:52.092Z",
+    "time_period": "Evening"
+  }
+}
+```
+
+#### 5. Delete a canva:
+Users can delete a canva that is undesired
+
+**POST Request: `delete/canva`**
+|Payload   	|Data Type   	|Description   	|   	|   	|
+|---	|---	|---	|---	|---	|
+|access_code   	|Int   	|User needs to enter the access code of the canva that they want to delete
+
+*Example:* 
+```
+Post Request: http://127.0.0.1:5000/moodboard/delete/canva
+Payload: access_code=3
+
+{
+  "Sucess": "User has already deleted the canva"
+}
+```
+
+#### 6. Delete an emoji:
+Users can delete an emoji that is undesired in a specific canva
+
+**POST Request: `delete/emoji`**
+|Payload   	|Data Type   	|Description   	|   	|   	|
+|---	|---	|---	|---	|---	|
+|access_code   	|Int   	|User needs to enter the access code of the canva that the emoji is belonged to
+|id |Int |Input the ID of the emoji that needs to be deleted
+
+*Example:* 
+```
+Post Request: http://127.0.0.1:5000/moodboard/delete/emoji
+Payload: access_code=3, id=15
+
+{
+  "Success": "Emoji has been deleted"
+}
+```
+
+### Common Error Message:
+|Error Message |Description|
+
 
 ## Setup
 1. Open Terminal

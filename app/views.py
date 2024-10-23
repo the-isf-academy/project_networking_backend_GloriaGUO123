@@ -98,7 +98,7 @@ def new_canva(args):
     new_canva.save()
     return {'Canva': new_canva.canva_json_response()}
 
-@route_post(BASE_URL + 'update/emoji', args={'change_emoji':str, 'id': int, 'access_code':str})
+@route_post(BASE_URL + 'update/emoji', args={'change_emoji':str, 'id': int, 'access_code':int})
 def update_emoji(args):
     if Canva.objects.filter(id=args['access_code']).exists():
         if Emoji.objects.filter(id=args['id']).exists() == True:
