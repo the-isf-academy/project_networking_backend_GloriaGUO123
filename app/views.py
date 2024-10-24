@@ -17,7 +17,7 @@ def all_emoji(args):
         elif emojis_list == []:
             return {'Error': 'No emojis exist in the canva currently'}
     elif Canva.objects.filter(id=args['access_code']).exists() == False:
-        return {'Error': 'Access code does not exit'}
+        return {'Error': 'Access code does not exist'}
 
 @route_get(BASE_URL + 'all/canva', args = {'access_code':str})
 def all_canvas(args):
@@ -83,7 +83,7 @@ def new_emoji(args):
         elif new_emoji.setting_position(args['access_code']) == False:
             return {'Error': 'The canva size has reached to its maximum'}
     elif Canva.objects.filter(id=args['access_code']).exists() == False:
-        return {'Error': 'Access code does not exit'}
+        return {'Error': 'Access code does not exist'}
         
 @route_post(BASE_URL + 'new/canva')
 def new_canva(args):
@@ -120,7 +120,7 @@ def like_canva(args):
         chosen_canva.add_view_and_calculating_popularity()
         return {'Canva':chosen_canva.canva_json_response()}
     else: 
-        return {'Error': "No canva exist"}
+        return {'Error': 'Access code does not exist'}
 
 @route_post(BASE_URL + 'delete/canva', args = {'access_code':int})
 def delete_canva(args):

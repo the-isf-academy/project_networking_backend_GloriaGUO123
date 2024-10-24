@@ -2,6 +2,7 @@
 
 from banjo.models import Model, StringField, IntegerField, FloatField, BooleanField, ForeignKey
 from datetime import datetime, time, timedelta, timezone
+from helper import allocating_time_period
 
 class Canva(Model): 
     like = IntegerField()
@@ -23,17 +24,20 @@ class Canva(Model):
         }
     
     def increase_like(self):
+        #increases the like of the canva
         self.like += 1
         self.save()
 
     def add_view_and_calculating_popularity(self):
         #Combining add_view with calculating popularity, as they work together 
         self.view +=1
+        #calculates the popularity percentage by diving like by view
         popularity = (self.like / self.view) * 100
         self.popularity_percentage = round(popularity, 2)
         self.save()
 
     def check_twentyfourhour_time_entry(self):
+        #convert the current time to HK time
         current_time = datetime.now(timezone.utc) +timedelta(hours=8)
         # Convert create_time into a datetime object
         created_time_datetime_object = datetime.strptime(self.created_time, '%Y-%m-%d %H:%M:%S.%f%z')
@@ -42,16 +46,11 @@ class Canva(Model):
         return time_difference < timedelta(hours=24)
 
     def check_time_period_entry(self, input_username):
+        #convert the current time to HK time
         current_time = datetime.now(timezone.utc) +timedelta(hours=8)
         current_time = current_time.time()
-        if time(4, 0) <= current_time < time(12, 0):
-            current_time_period = "Morning"
-        #Afternoon: 12:00 PM to 5:59 PM
-        elif time(12, 0) <= current_time < time(18, 0):
-            current_time_period = "Afternoon"
-        #Evening: 6:00 PM to 3:59 AM
-        else:
-            current_time_period = "Evening"
+        #allocates a time period to the current time
+        current_time_period = allocating_time_period(current_time)
         # Checks if a specific user has already added an Emoji in the current time period
         for emoji in Emoji.objects.filter(canva=self, username=input_username):
             if emoji.time_period == current_time_period:
@@ -106,27 +105,14 @@ class Emoji(Model):
     def allocate_time_period(self):
         #extract the time part from the datetime object
         extracted_input_time = self.input_time.time()
-        #Morning: 4:00 AM to 11:59 AM
-        if time(4, 0) <= extracted_input_time < time(12, 0):
-            self.time_period = "Morning"
-        #Afternoon: 12:00 PM to 5:59 PM
-        elif time(12, 0) <= extracted_input_time < time(18, 0):
-            self.time_period = "Afternoon"
-        #Evening: 6:00 PM to 3:59 AM
-        else:
-            self.time_period = "Evening"
+        self.time_period = allocating_time_period(extracted_input_time)
 
     def change(self,input_emoji):
+        #convert the current time to HK time
         current_time = datetime.now(timezone.utc)+timedelta(hours=8)
         current_time = current_time.time()
-        if time(4, 0) <= current_time < time(12, 0):
-            time_period = "Morning"
-        #Afternoon: 12:00 PM to 5:59 PM
-        elif time(12, 0) <= current_time < time(18, 0):
-            time_period = "Afternoon"
-        #Evening: 6:00 PM to 3:59 AM
-        else:
-            time_period = "Evening"
+        time_period = allocating_time_period(current_time)
+        #checks if the self.time period is same as time_period then it will update the emoji
         if self.time_period == time_period:
             self.emoji = input_emoji
             self.input_time = datetime.now(timezone.utc) +timedelta(hours=8)
